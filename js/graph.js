@@ -25,6 +25,8 @@ const graph = svg.append('g')
     .attr('class', 'y-axis');
 
 const update = (data) => {
+
+  data = data.filter(item => item.activity == activity);
   
   // set scale domains
   x.domain(d3.extent(data, d => new Date(d.date)));
