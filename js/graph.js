@@ -12,25 +12,43 @@ const graph = svg.append('g')
   .attr('height', graphHeight)
   .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-  // scales
-  const x = d3.scaleTime().range([0, graphWidth]);
-  const y = d3.scaleLinear().range([graphHeight, 0]);
+// scales
+const x = d3.scaleTime().range([0, graphWidth]);
+const y = d3.scaleLinear().range([graphHeight, 0]);
 
-  // axis groups
-  const xAxisGroup = graph.append('g')
-    .attr('class', 'x-axis')
-    .attr('transform', "translate(0, " + graphHeight + ")");
+// axis groups
+const xAxisGroup = graph.append('g')
+  .attr('class', 'x-axis')
+  .attr('transform', "translate(0, " + graphHeight + ")");
 
-  const yAxisGroup = graph.append('g')
-    .attr('class', 'y-axis');
+const yAxisGroup = graph.append('g')
+  .attr('class', 'y-axis');
+
+// d3 line path generator
+const line = d3.line()
+  .x(function(d) { return x(new Date(d.date))})
+  .y(function(d) { return y(d.distance)});
+
+// line path element
+const path = graph.append('path');
 
 const update = (data) => {
 
   data = data.filter(item => item.activity == activity);
   
+  // sort data based on date objects
+  data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
   // set scale domains
   x.domain(d3.extent(data, d => new Date(d.date)));
   y.domain([0, d3.max(data, d => d.distance)]);
+
+  // update path data
+  path.data([data])
+    .attr('fill', 'none')
+    .attr('stroke', '#00bfa5')
+    .attr('stroke-width', 2)
+    .attr('d', line);
 
   // create circles for objects
   const circles = graph.selectAll('circle')
